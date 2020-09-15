@@ -46,6 +46,9 @@ int main(int argc, char* argv[])
     int ap_num=0;
     int ap_index=1;
 
+
+    int reset = remove("./data/deauth.txt");
+
     while (true)
     {
         struct pcap_pkthdr* header;
