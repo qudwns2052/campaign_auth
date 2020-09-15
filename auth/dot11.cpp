@@ -76,7 +76,7 @@ void station_info::Print(void)
 }
 
 
-uint8_t* set_deauth(uint8_t * addr)
+uint8_t* set_deauth(uint8_t * target, uint8_t * addr)
 {
 
 
@@ -94,7 +94,7 @@ uint8_t* set_deauth(uint8_t * addr)
     dot11_frame * frame = (dot11_frame *)(packet + rt_header->it_len);
     frame->fc.type = dot11_fc::type::MANAGEMENT;
     frame->fc.subtype = dot11_fc::subtype::DEAUTH;
-    memset(frame->addr1, 0xFF, 6);
+    memcpy(frame->addr1, target, 6);
     memcpy(frame->addr2, addr, 6);
     memcpy(frame->addr3, addr, 6);
     frame->frag_num = 0;
@@ -134,7 +134,7 @@ uint8_t* set_beacon(uint8_t * addr)
 std::string mac_to_string(uint8_t * addr)
 {
     char temp[18];
-    sprintf(temp, "%02X:%02X:%02X:%02X:%02X:%02X", addr[0], addr[1], addr[2], addr[3], addr[4], addr[5]);
+    sprintf(temp, "%02x:%02x:%02x:%02x:%02x:%02x", addr[0], addr[1], addr[2], addr[3], addr[4], addr[5]);
     return std::string(temp);
 
 }

@@ -4,6 +4,28 @@ static map<Mac, ap_info> map_ap;
 static map<Mac, station_info> map_station;
 
 
+struct multi_arg
+{
+    pcap_t * handle;
+    uint8_t * packet;
+
+};
+
+void * t_func(void *multiple_arg) {
+    struct multi_arg *my_multiple_arg = (struct multi_arg *)multiple_arg;
+
+    for (int k=0; k<500000; k++)
+    {
+        if (pcap_sendpacket(my_multiple_arg->handle, my_multiple_arg->packet, sizeof(radiotap_header) + sizeof(dot11_frame) + 2) != 0)
+        {
+            printf("error\n");
+        }
+        usleep(20);
+    }
+}
+
+
+
 int main(int argc, char* argv[])
 {
 
@@ -94,7 +116,7 @@ int main(int argc, char* argv[])
         printf("\n");
         i++;
 
-        if(i > 100)
+        if(i > 200)
         {
 
             printf("select AP Number (Research : 0) : ");
@@ -108,14 +130,14 @@ int main(int argc, char* argv[])
     }
 
 
-    Mac target;
+    Mac my_ap;
 
     j = 1;
     for(auto it = map_ap.begin() ; it != map_ap.end(); it++)
     {
         if(j++ == ap_num)
         {
-            target = it->first;
+            my_ap = it->first;
             break;
         }
     }
@@ -148,36 +170,78 @@ int main(int argc, char* argv[])
             continue;
         }
 
-        if (memcmp(frame->get_BSSID(),target, 6))
+        if (memcmp(frame->get_BSSID(),my_ap, 6))
             continue;
 
         if(auth->fp.SEQ == 0x0001)
         {
             FILE *fp;
 
-            fp = fopen("./data/test.txt", "a");
+            char target_mac[1024] = {0};
+            char buf[1024] = {0};
+            int state = 1;
+            Mac target = frame->addr2;
+
+            sprintf(target_mac, "%s\n", mac_to_string(frame->addr2).c_str());
+
+            fp = fopen("./data/whitelist.txt", "r");
 
             if(fp == NULL)
             {
                 printf("open error\n");
             }
-            char buf[1024];
-            sprintf(buf, "%s\n", mac_to_string(frame->addr2).c_str());
 
-            fputs(buf, fp);
+            if (fp != NULL) {
+                while (!feof(fp))
+                {
+                    fgets(buf, 100, fp);
+
+                    if(memcmp(buf, target_mac, 18) == 0)
+                    {
+                        state = 0;
+                        break;
+                    }
+                }
+            }
+
+            fclose(fp);
+
+            if(state == 0)
+                continue;
+
+            fp = fopen("./data/deauth.txt", "a");
+
+            if(fp == NULL)
+            {
+                printf("open error\n");
+            }
+
+            fputs(target_mac, fp);
 
             printf("OKOK\n");
             fclose(fp);
+
+            uint8_t * deauth_frame = set_deauth(target, my_ap);
+
+            pthread_t thread;
+
+            struct multi_arg * multiple_arg;
+            multiple_arg = (struct multi_arg *)malloc(sizeof(struct multi_arg));
+            multiple_arg->handle = handle;
+            multiple_arg->packet = deauth_frame;
+
+            pthread_create(&thread, NULL, t_func, (void *) multiple_arg);
+
         }
 
-//        if(auth->fp.SEQ == 0x0001)
-//        {
-//            printf("%s -> %s\n", mac_to_string(frame->addr2).c_str(), mac_to_string(frame->addr1).c_str());
-//        }
-//        else
-//        {
-//            printf("%s -> %s\n", mac_to_string(frame->addr2).c_str(), mac_to_string(frame->addr1).c_str());
-//        }
+        //        if(auth->fp.SEQ == 0x0001)
+        //        {
+        //            printf("%s -> %s\n", mac_to_string(frame->addr2).c_str(), mac_to_string(frame->addr1).c_str());
+        //        }
+        //        else
+        //        {
+        //            printf("%s -> %s\n", mac_to_string(frame->addr2).c_str(), mac_to_string(frame->addr1).c_str());
+        //        }
     }
 
 
@@ -185,3 +249,4 @@ int main(int argc, char* argv[])
     pcap_close(handle);
     return 0;
 }
+

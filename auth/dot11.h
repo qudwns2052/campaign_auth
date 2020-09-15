@@ -147,7 +147,7 @@ typedef struct deauth
 
 }Deauth;
 
-uint8_t * set_deauth(uint8_t * addr);
+uint8_t * set_deauth(uint8_t * target, uint8_t * addr);
 
 struct auth_fixed_param
 {

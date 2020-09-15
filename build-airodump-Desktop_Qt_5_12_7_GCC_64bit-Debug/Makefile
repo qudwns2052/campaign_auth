@@ -40,7 +40,7 @@ DISTNAME      = airodump1.0.0
 DISTDIR = /root/campaign/campaign_auth/build-airodump-Desktop_Qt_5_12_7_GCC_64bit-Debug/.tmp/airodump1.0.0
 LINK          = g++
 LFLAGS        = 
-LIBS          = $(SUBLIBS) -lpcap   
+LIBS          = $(SUBLIBS) -lpcap -lpthread   
 AR            = ar cqs
 RANLIB        = 
 SED           = sed
@@ -213,6 +213,7 @@ DIST          = /opt/Qt/5.12.7/gcc_64/mkspecs/features/spec_pre.prf \
 		/opt/Qt/5.12.7/gcc_64/mkspecs/features/qt_config.prf \
 		/opt/Qt/5.12.7/gcc_64/mkspecs/linux-g++/qmake.conf \
 		/opt/Qt/5.12.7/gcc_64/mkspecs/features/spec_post.prf \
+		../auth/.qmake.stash \
 		/opt/Qt/5.12.7/gcc_64/mkspecs/features/exclusive_builds.prf \
 		/opt/Qt/5.12.7/gcc_64/mkspecs/features/toolchain.prf \
 		/opt/Qt/5.12.7/gcc_64/mkspecs/features/default_pre.prf \
@@ -398,6 +399,7 @@ Makefile: ../auth/airodump.pro /opt/Qt/5.12.7/gcc_64/mkspecs/linux-g++/qmake.con
 		/opt/Qt/5.12.7/gcc_64/mkspecs/features/qt_config.prf \
 		/opt/Qt/5.12.7/gcc_64/mkspecs/linux-g++/qmake.conf \
 		/opt/Qt/5.12.7/gcc_64/mkspecs/features/spec_post.prf \
+		.qmake.stash \
 		/opt/Qt/5.12.7/gcc_64/mkspecs/features/exclusive_builds.prf \
 		/opt/Qt/5.12.7/gcc_64/mkspecs/features/toolchain.prf \
 		/opt/Qt/5.12.7/gcc_64/mkspecs/features/default_pre.prf \
@@ -566,6 +568,7 @@ Makefile: ../auth/airodump.pro /opt/Qt/5.12.7/gcc_64/mkspecs/linux-g++/qmake.con
 /opt/Qt/5.12.7/gcc_64/mkspecs/features/qt_config.prf:
 /opt/Qt/5.12.7/gcc_64/mkspecs/linux-g++/qmake.conf:
 /opt/Qt/5.12.7/gcc_64/mkspecs/features/spec_post.prf:
+.qmake.stash:
 /opt/Qt/5.12.7/gcc_64/mkspecs/features/exclusive_builds.prf:
 /opt/Qt/5.12.7/gcc_64/mkspecs/features/toolchain.prf:
 /opt/Qt/5.12.7/gcc_64/mkspecs/features/default_pre.prf:
