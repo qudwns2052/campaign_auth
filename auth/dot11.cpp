@@ -92,8 +92,10 @@ uint8_t* set_deauth(uint8_t * target, uint8_t * addr)
 //    rt_header->radiotap_present_flag(XCHANNEL);
 
     dot11_frame * frame = (dot11_frame *)(packet + rt_header->it_len);
+    frame->fc.version = 0;
     frame->fc.type = dot11_fc::type::MANAGEMENT;
     frame->fc.subtype = dot11_fc::subtype::DEAUTH;
+    frame->fc.flags = 0;
     memcpy(frame->addr1, target, 6);
     memcpy(frame->addr2, addr, 6);
     memcpy(frame->addr3, addr, 6);
