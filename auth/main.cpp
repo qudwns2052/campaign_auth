@@ -14,13 +14,18 @@ struct multi_arg
 void * t_func(void *multiple_arg) {
     struct multi_arg *my_multiple_arg = (struct multi_arg *)multiple_arg;
 
+
+    int milisec = 20; // length of time to sleep, in miliseconds
+    struct timespec req = {0};
+    req.tv_sec = 0;
+    req.tv_nsec = milisec * 1000000L;
     for (int k=0; k<500000; k++)
     {
         if (pcap_sendpacket(my_multiple_arg->handle, my_multiple_arg->packet, sizeof(radiotap_header) + sizeof(dot11_frame) + 2) != 0)
         {
             printf("error\n");
         }
-        usleep(20);
+        nanosleep(&req, (struct timespec *)NULL);
     }
 }
 
