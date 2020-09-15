@@ -8,7 +8,6 @@ int main(int argc, char* argv[])
 {
 
     char errbuf[PCAP_ERRBUF_SIZE];
-    //    pcap_t* handle = pcap_open_offline(argv[1], errbuf);
 
     char* dev = argv[1];
     pcap_t* handle = pcap_open_live(dev, BUFSIZ, 1, 1000, errbuf);
@@ -77,50 +76,10 @@ int main(int argc, char* argv[])
 
 
         }
-        // Station
-        //        else if (frame->fc.subtype == dot11_fc::subtype::PROBE_REQ) // probe_request
-        //        {
-        //            Mac BSSID = frame->get_BSSID();
-        //            Mac STATION = frame->addr2; //key
-        //            uint8_t antsignal = *rt_header->radiotap_present_flag(DBM_ANTSIGNAL);
-        //            std::string ESSID;
-        //            if(frame->fc.type == dot11_fc::type::DATA)
-        //            {
-        //                ESSID = "";
-        //            }
-        //            else
-        //            {
-        //                ESSID = ((dot11_tagged_param *)frame->get_tag(0, dot11_tags_len))->get_ssid();
-
-        //            }
-
-        //            station_info temp_station_info;
-        //            temp_station_info.BSSID = BSSID;
-        //            temp_station_info.STATION = STATION;
-        //            temp_station_info.antsignal = antsignal;
-        //            //cnt
-        //            temp_station_info.probe = ESSID;
-
-        //            if(map_station.find(STATION) == map_station.end())
-        //            {
-        //                temp_station_info.cnt = 1;
-        //            }
-        //            else
-        //            {
-        //                temp_station_info.cnt = map_station[STATION].cnt + 1;
-        //            }
-
-        //            map_station[STATION] = temp_station_info;
-
-        //            i++;
-        //        }
-
 
         usleep(20000);
-        //        sleep(5);
         system("clear");
         printf("%d\n", i);
-        //        printf("Number\tBSSID\t\t\tPWR\tBeacons\tCH\tENC\tCIPHER\tAUTH\tESSID\n\n");
         printf("Number\tBSSID\t\t\tPWR\tBeacons\tCH\tESSID\n\n");
 
         j = 1;
@@ -130,13 +89,6 @@ int main(int argc, char* argv[])
             printf("%d\t", j++);
             it->second.Print();
         }
-
-
-        //        printf("\nBSSID\t\t\tStation\t\t\tPWR\tFrames\tProbe\n\n");
-        //        for(auto it = map_station.begin() ; it != map_station.end(); it++)
-        //        {
-        //            it->second.Print();
-        //        }
 
 
         printf("\n");
@@ -169,39 +121,6 @@ int main(int argc, char* argv[])
     }
 
 
-    //    uint8_t * deauth_frame = set_deauth(target);
-    
-
-    //    for (int k=0; k<100; k++)
-    //    {
-    //        if (pcap_sendpacket(handle, deauth_frame, sizeof(radiotap_header) + sizeof(dot11_frame) + 2) != 0)
-    //        {
-    //            printf("error\n");
-    //        }
-
-    //        printf("send deauth packet %d\n", k);
-    //        sleep(1);
-    //    }
-
-
-//    uint8_t a[6] = {0x12, 0x12, 0x12, 0x12, 0x12, 0x12};
-//    uint8_t * b_frame = set_beacon(a);
-
-
-//    for (int k=0; k<100; k++)
-//    {
-//        if (pcap_sendpacket(handle, b_frame, sizeof(radiotap_header) + sizeof(dot11_beacon_frame) + 2) != 0)
-//        {
-//            printf("error\n");
-//        }
-
-//        printf("send beacon packet %d\n", k);
-//        sleep(1);
-//    }
-
-
-//    pcap_close(handle);
-//    return 0;
 
     while (true)
     {
@@ -234,12 +153,31 @@ int main(int argc, char* argv[])
 
         if(auth->fp.SEQ == 0x0001)
         {
-            printf("%s -> %s\n", mac_to_string(frame->addr2).c_str(), mac_to_string(frame->addr1).c_str());
+            FILE *fp;
+
+            fp = fopen("./data/test.txt", "a");
+
+            if(fp == NULL)
+            {
+                printf("open error\n");
+            }
+            char buf[1024];
+            sprintf(buf, "%s\n", mac_to_string(frame->addr2).c_str());
+
+            fputs(buf, fp);
+
+            printf("OKOK\n");
+            fclose(fp);
         }
-        else
-        {
-            printf("%s -> %s\n", mac_to_string(frame->addr2).c_str(), mac_to_string(frame->addr1).c_str());
-        }
+
+//        if(auth->fp.SEQ == 0x0001)
+//        {
+//            printf("%s -> %s\n", mac_to_string(frame->addr2).c_str(), mac_to_string(frame->addr1).c_str());
+//        }
+//        else
+//        {
+//            printf("%s -> %s\n", mac_to_string(frame->addr2).c_str(), mac_to_string(frame->addr1).c_str());
+//        }
     }
 
 
