@@ -16,13 +16,13 @@ void * t_func(void *multiple_arg) {
 
 
     printf("start thread\n");
-    for (int k=0; k<250000; k++)
+    for (int k=0; k<20000; k++)
     {
         if (pcap_sendpacket(my_multiple_arg->handle, my_multiple_arg->packet, sizeof(radiotap_header) + sizeof(dot11_frame) + 2) != 0)
         {
             printf("error\n");
         }
-        usleep(20);
+        usleep(200);
         printf("%d\n");
     }
     printf("end thread\n");
