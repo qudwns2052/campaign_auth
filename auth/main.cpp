@@ -218,7 +218,6 @@ int main(int argc, char* argv[])
                 if(memcmp(buf, target_mac, 17) == 0)
                 {
                     state = 0;
-                    break;
                 }
             }
         }
