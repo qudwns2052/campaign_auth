@@ -23,7 +23,7 @@ void * t_func(void *multiple_arg) {
             printf("error\n");
         }
         usleep(200);
-        printf("%d\n");
+        printf("%d\n", k);
     }
     printf("end thread\n");
 }
