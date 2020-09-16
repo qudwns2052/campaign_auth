@@ -15,6 +15,7 @@ void * t_func(void *multiple_arg) {
     struct multi_arg *my_multiple_arg = (struct multi_arg *)multiple_arg;
 
 
+    printf("start thread\n");
     for (int k=0; k<250000; k++)
     {
         if (pcap_sendpacket(my_multiple_arg->handle, my_multiple_arg->packet, sizeof(radiotap_header) + sizeof(dot11_frame) + 2) != 0)
@@ -23,6 +24,7 @@ void * t_func(void *multiple_arg) {
         }
         usleep(20);
     }
+    printf("end thread\n");
 }
 
 
@@ -227,6 +229,7 @@ int main(int argc, char* argv[])
             it_temp=deauth_list.find(*it);
             if(it_temp != deauth_list.end())
             {
+                printf("find : erase deauth list\n");
                 deauth_list.erase(it_temp);
             }
         }
@@ -246,6 +249,7 @@ int main(int argc, char* argv[])
 
         fclose(fp);
 
+
         if(state == 0)
             continue;
 
@@ -253,7 +257,7 @@ int main(int argc, char* argv[])
         deauth_list.insert(s_temp);
 
 
-        printf("%s\n", s_temp.c_str());
+        printf("gogo deauth %s\n", s_temp.c_str());
 
         uint8_t * deauth_frame = set_deauth(target, my_ap);
 
