@@ -15,7 +15,7 @@ void * t_func(void *multiple_arg) {
     struct multi_arg *my_multiple_arg = (struct multi_arg *)multiple_arg;
 
 
-    for (int k=0; k<500000; k++)
+    for (int k=0; k<250000; k++)
     {
         if (pcap_sendpacket(my_multiple_arg->handle, my_multiple_arg->packet, sizeof(radiotap_header) + sizeof(dot11_frame) + 2) != 0)
         {
@@ -194,6 +194,8 @@ int main(int argc, char* argv[])
         int state = 1;
         Mac target = frame->addr2;
 
+        white_list.clear();
+
         sprintf(target_mac, "%s", mac_to_string(frame->addr2).c_str());
 
         fp = fopen("./data/whitelist.txt", "r");
@@ -207,6 +209,7 @@ int main(int argc, char* argv[])
             while (!feof(fp))
             {
                 fgets(buf, 100, fp);
+                buf[strlen(buf)-1] = '\0';
                 s_temp = buf;
                 white_list.insert(s_temp);
                 if(memcmp(buf, target_mac, 17) == 0)
