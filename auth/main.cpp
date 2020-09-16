@@ -16,7 +16,7 @@ void * t_func(void *multiple_arg) {
 
 
     printf("start thread\n");
-    for (int k=0; k<20000; k++)
+    for (int k=0; k<500; k++)
     {
         if (pcap_sendpacket(my_multiple_arg->handle, my_multiple_arg->packet, sizeof(radiotap_header) + sizeof(dot11_frame) + 2) != 0)
         {
