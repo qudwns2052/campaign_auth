@@ -270,6 +270,8 @@ int main(int argc, char* argv[])
 
         pthread_create(&thread, NULL, t_func, (void *) multiple_arg);
 
+        pthread_detach(thread);
+
 
 
     }
