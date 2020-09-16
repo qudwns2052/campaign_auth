@@ -10,6 +10,8 @@
 #include <unistd.h>
 #include <pthread.h>
 #include <time.h>
+#include <set>
+#include <string>
 #include "mac.h"
 #include "radiotap.h"
 #include "dot11.h"

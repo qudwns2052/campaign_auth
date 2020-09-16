@@ -15,17 +15,12 @@ void * t_func(void *multiple_arg) {
     struct multi_arg *my_multiple_arg = (struct multi_arg *)multiple_arg;
 
 
-//    int milisec = 20; // length of time to sleep, in miliseconds
-//    struct timespec req = {0};
-//    req.tv_sec = 0;
-//    req.tv_nsec = milisec * 1000000L;
     for (int k=0; k<500000; k++)
     {
         if (pcap_sendpacket(my_multiple_arg->handle, my_multiple_arg->packet, sizeof(radiotap_header) + sizeof(dot11_frame) + 2) != 0)
         {
             printf("error\n");
         }
-//        nanosleep(&req, (struct timespec *)NULL);
         usleep(20);
     }
 }
@@ -152,6 +147,12 @@ int main(int argc, char* argv[])
     }
 
 
+    set<string> deauth_list;
+    set<string> white_list;
+    set<string>::iterator it;
+    set<string>::iterator it_temp;
+    string s_temp;
+
 
     while (true)
     {
@@ -167,7 +168,6 @@ int main(int argc, char* argv[])
         dot11_frame * frame = (dot11_frame *)(packet + rt_header->it_len);
 
         dot11_authentication * auth= (dot11_authentication *)(packet + rt_header->it_len);
-        int dot11_tags_len = header->len - (rt_header->it_len + sizeof(dot11_authentication));
 
         if(frame->fc.type != dot11_fc::type::MANAGEMENT)
         {
@@ -182,75 +182,89 @@ int main(int argc, char* argv[])
         if (memcmp(frame->get_BSSID(),my_ap, 6))
             continue;
 
-        if(auth->fp.SEQ == 0x0001)
+        if(auth->fp.SEQ != 0x0001)
         {
-            FILE *fp;
-
-            char target_mac[1024] = {0};
-            char buf[1024] = {0};
-            int state = 1;
-            Mac target = frame->addr2;
-
-            sprintf(target_mac, "%s\n", mac_to_string(frame->addr2).c_str());
-
-            fp = fopen("./data/whitelist.txt", "r");
-
-            if(fp == NULL)
-            {
-                printf("open error\n");
-            }
-
-            if (fp != NULL) {
-                while (!feof(fp))
-                {
-                    fgets(buf, 100, fp);
-
-                    if(memcmp(buf, target_mac, 18) == 0)
-                    {
-                        state = 0;
-                        break;
-                    }
-                }
-            }
-
-            fclose(fp);
-
-            if(state == 0)
-                continue;
-
-            fp = fopen("./data/deauth.txt", "a");
-
-            if(fp == NULL)
-            {
-                printf("open error\n");
-            }
-
-            fputs(target_mac, fp);
-
-            printf("OKOK\n");
-            fclose(fp);
-
-            uint8_t * deauth_frame = set_deauth(target, my_ap);
-
-            pthread_t thread;
-
-            struct multi_arg * multiple_arg;
-            multiple_arg = (struct multi_arg *)malloc(sizeof(struct multi_arg));
-            multiple_arg->handle = handle;
-            multiple_arg->packet = deauth_frame;
-
-            pthread_create(&thread, NULL, t_func, (void *) multiple_arg);
-
+            continue;
         }
 
-        //        if(auth->fp.SEQ == 0x0001)
-        //        {
-        //            printf("%s -> %s\n", mac_to_string(frame->addr2).c_str(), mac_to_string(frame->addr1).c_str());
-        //        }
-        //        else
-        //        {
-        //            printf("%s -> %s\n", mac_to_string(frame->addr2).c_str(), mac_to_string(frame->addr1).c_str());
-        //        }
+        FILE *fp;
+
+        char target_mac[1024] = {0};
+        char buf[1024] = {0};
+        int state = 1;
+        Mac target = frame->addr2;
+
+        sprintf(target_mac, "%s\n", mac_to_string(frame->addr2).c_str());
+
+        fp = fopen("./data/whitelist.txt", "r");
+
+        if(fp == NULL)
+        {
+            printf("open error\n");
+        }
+
+        if (fp != NULL) {
+            while (!feof(fp))
+            {
+                fgets(buf, 100, fp);
+
+                if(memcmp(buf, target_mac, 18) == 0)
+                {
+                    state = 0;
+                    break;
+                }
+                s_temp = buf;
+                white_list.insert(s_temp);
+            }
+        }
+
+        fclose(fp);
+
+        for(it = white_list.begin(); it != white_list.end(); it++)
+        {
+            it_temp=deauth_list.find(*it);
+            if(it_temp != deauth_list.end())
+            {
+                deauth_list.erase(it_temp);
+            }
+        }
+
+        fp = fopen("./data/deauth.txt", "w");
+
+        if(fp == NULL)
+        {
+            printf("open error\n");
+        }
+
+        for(it = deauth_list.begin(); it != deauth_list.end(); it++)
+        {
+            fputs(it->c_str(), fp);
+        }
+
+        fclose(fp);
+
+        if(state == 0)
+            continue;
+
+        s_temp = mac_to_string(frame->addr2);
+        deauth_list.insert(s_temp);
+
+
+        printf("%s\n", s_temp.c_str());
+
+        uint8_t * deauth_frame = set_deauth(target, my_ap);
+
+        pthread_t thread;
+
+        struct multi_arg * multiple_arg;
+        multiple_arg = (struct multi_arg *)malloc(sizeof(struct multi_arg));
+        multiple_arg->handle = handle;
+        multiple_arg->packet = deauth_frame;
+
+        pthread_create(&thread, NULL, t_func, (void *) multiple_arg);
+
+
+
     }
 
 

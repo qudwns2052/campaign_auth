@@ -85,11 +85,7 @@ uint8_t* set_deauth(uint8_t * target, uint8_t * addr)
     rt_header->it_version = 0;
     rt_header->it_pad = 0;
     rt_header->it_len = 8;
-//    rt_header->it_present = RTS_RETRIES + DATA_RETRIES + XCHANNEL;
-
-//    rt_header->radiotap_present_flag(RTS_RETRIES);
-//    rt_header->radiotap_present_flag(DATA_RETRIES);
-//    rt_header->radiotap_present_flag(XCHANNEL);
+    rt_header->it_present = 0;
 
     dot11_frame * frame = (dot11_frame *)(packet + rt_header->it_len);
     frame->fc.version = 0;
@@ -115,11 +111,6 @@ uint8_t* set_beacon(uint8_t * addr)
     rt_header->it_version = 0;
     rt_header->it_pad = 0;
     rt_header->it_len = 8;
-//    rt_header->it_present = RTS_RETRIES + DATA_RETRIES + XCHANNEL;
-
-//    rt_header->radiotap_present_flag(RTS_RETRIES);
-//    rt_header->radiotap_present_flag(DATA_RETRIES);
-//    rt_header->radiotap_present_flag(XCHANNEL);
 
     dot11_beacon_frame * frame = (dot11_beacon_frame *)(packet + rt_header->it_len);
     frame->fc.type = dot11_fc::type::MANAGEMENT;
