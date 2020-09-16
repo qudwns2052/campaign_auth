@@ -194,7 +194,7 @@ int main(int argc, char* argv[])
         int state = 1;
         Mac target = frame->addr2;
 
-        sprintf(target_mac, "%s\n", mac_to_string(frame->addr2).c_str());
+        sprintf(target_mac, "%s", mac_to_string(frame->addr2).c_str());
 
         fp = fopen("./data/whitelist.txt", "r");
 
@@ -207,14 +207,13 @@ int main(int argc, char* argv[])
             while (!feof(fp))
             {
                 fgets(buf, 100, fp);
-
-                if(memcmp(buf, target_mac, 18) == 0)
+                s_temp = buf;
+                white_list.insert(s_temp);
+                if(memcmp(buf, target_mac, 17) == 0)
                 {
                     state = 0;
                     break;
                 }
-                s_temp = buf;
-                white_list.insert(s_temp);
             }
         }
 
@@ -239,6 +238,7 @@ int main(int argc, char* argv[])
         for(it = deauth_list.begin(); it != deauth_list.end(); it++)
         {
             fputs(it->c_str(), fp);
+            fputs("\n", fp);
         }
 
         fclose(fp);
